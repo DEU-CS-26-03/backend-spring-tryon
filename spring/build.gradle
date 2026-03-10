@@ -38,7 +38,8 @@ dependencies {
     
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security' // 시큐리티 테스트용
+    testImplementation 'org.springframework.boot:spring-boot-starter-security'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'// 시큐리티 테스트용
 }
 
 tasks.named('test') {
