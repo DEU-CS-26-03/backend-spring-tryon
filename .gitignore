@@ -1,0 +1,21 @@
+# Git/IDE
+.idea/
+.gradle/
+out/
+bin/
+*.iml
+
+# Build
+build/
+**/build/
+*.log
+*.tmp
+*.swp
+
+# OS
+.DS_Store
+
+# Env / secrets
+.env
+.env.*
+!.env.example
