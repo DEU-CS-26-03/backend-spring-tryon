@@ -71,6 +71,10 @@ services:
       # Python 서비스 URL (서비스명 기준)
       PYTHON_SERVICE_URL: http://python-app:8000
       TZ: Asia/Seoul
+      # JWT 설정
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+
     ports:
       - "8080:8080"
     networks:

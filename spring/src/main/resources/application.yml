@@ -1,8 +1,6 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    # localhost → capstone-mariadb (Docker 네트워크 내부 통신)
-    # 하드코딩 제거 → 환경변수로 주입, 없을 경우 기본값 사용
     url: jdbc:mariadb://${DB_HOST:capstone-mariadb}:${MARIA_PORT:3306}/${MARIA_DATABASE:capstone_db}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: ${MARIA_USER:capstone}
     password: ${MARIA_PASSWORD:capstonepass}
@@ -20,5 +18,8 @@ server:
 
 python:
   service:
-    # Docker 내부: capstone-python, 로컬 단독 실행: localhost
     url: ${PYTHON_SERVICE_URL:http://capstone-python:8000}
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-long-enough}
+  expiration: ${JWT_EXPIRATION:3600000}
