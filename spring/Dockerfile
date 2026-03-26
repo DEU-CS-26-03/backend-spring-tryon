@@ -2,20 +2,18 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /app
 
-COPY gradlew .
+COPY gradlew ./
 COPY gradle ./gradle
-COPY build.gradle .
-COPY settings.gradle .
+COPY build.gradle settings.gradle ./
 COPY src ./src
 
-RUN chmod +x ./gradlew
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 RUN ./gradlew clean bootJar -x test --no-daemon
 
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-#메모리 제어 파트(라즈베리 파이5 사용시 관여)
 ENV TZ=Asia/Seoul
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
 
