@@ -22,13 +22,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        // 로그인/회원가입 등 인증 공개 경로는 JWT 필터를 적용하지 않는다.
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(request);
 
-        // 토큰이 있고 유효하면 SecurityContext에 인증 정보 저장
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -37,7 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // "Authorization: Bearer {token}" 에서 토큰 추출
     private String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
         if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
