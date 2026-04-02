@@ -13,4 +13,6 @@ bin
 *.log
 *.tmp
 *.swp
+*.iml
 .DS_Store
+src/test
