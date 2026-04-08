@@ -1,9 +1,10 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${MARIA_DATABASE:capstone_db}?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: ${MARIA_USER:capstone}
-    password: ${MARIA_PASSWORD:capstonepass}
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
 
   data:
     redis:

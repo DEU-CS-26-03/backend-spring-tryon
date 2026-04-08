@@ -23,12 +23,3 @@ public class FileStorageProperties {
     public void setResultRoot(String resultRoot) {
         this.resultRoot = resultRoot;
     }
-}
-// 외부 설정을 객체에 바인딩
-@EnableConfigurationProperties(FileStorageProperties.class)
-@SpringBootApplication
-public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-}
