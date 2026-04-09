@@ -57,7 +57,7 @@ public class GarmentService {
         // 용량 검증
         if (file.getSize() > MAX_SIZE_BYTES) {
             throw new IllegalArgumentException("파일 크기는 20MB를 초과할 수 없습니다.");
-        }`
+        }
 
         // 카테고리 검증
         if (category != null && !category.isBlank()
