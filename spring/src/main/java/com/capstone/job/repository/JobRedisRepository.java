@@ -58,29 +58,28 @@ public class JobRedisRepository {
 
     /**
      * TryonService용 통합 저장 메서드
-     * - status + progress를 한 번에 Hash에 저장
-     * - Key가 없으면 새로 생성, 있으면 두 필드만 덮어씀
-     * - TTL은 기본 1시간 적용
+     * - status + progress를 Hash에 함께 저장
+     * - Key가 없을 때만 TTL 1시간 신규 설정 (기존 TTL 보호)
      */
     public void save(String jobId, String status, int progress) {
         String key = KEY_PREFIX + jobId;
         redisTemplate.opsForHash().put(key, "status", status);
         redisTemplate.opsForHash().put(key, "progress", String.valueOf(progress));
-        // Key가 새로 만들어진 경우에만 TTL 설정 (기존 TTL 초기화 방지)
-        Boolean hasExpire = redisTemplate.getExpire(key) > 0L;
-        if (!hasExpire) {
+        Long expireSeconds = redisTemplate.getExpire(key);
+        if (expireSeconds == null || expireSeconds < 0) {
             redisTemplate.expire(key, TTL);
         }
     }
 
     /**
-     * status 조회 (TryonService의 Redis 1차 조회용)
-     * - 없으면 null 반환 → TryonService에서 DB fallback으로 전환됨
+     * TryonService 1차 캐시 조회용
+     * - getStatus() 위임으로 단순화 (중복 구현 제거)
+     * - 없으면 null → TryonService에서 DB fallback으로 전환
      */
     public String findStatusById(String jobId) {
-        Object status = redisTemplate.opsForHash().get(KEY_PREFIX + jobId, "status");
-        return status != null ? status.toString() : null;
+        return getStatus(jobId); // 기존 메서드 재사용
     }
+
 
     /**
      * progress 조회
