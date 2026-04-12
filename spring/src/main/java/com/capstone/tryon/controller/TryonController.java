@@ -18,13 +18,8 @@ public class TryonController {
     private final TryonService tryonService;
 
     @PostMapping
-    public ResponseEntity<?> createJob(@RequestBody TryonCreateRequest request) {
-        return ResponseEntity.ok(tryonService.createJob(request));
-    }
-
-    @PostMapping("/{jobId}/start")
-    public ResponseEntity<?> startJob(@PathVariable String jobId) {
-        return ResponseEntity.ok(tryonService.startJob(jobId));
+    public ResponseEntity<?> createJob(@Valid @RequestBody TryonCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(tryonService.createJob(request));
     }
 
     @GetMapping("/{jobId}")
