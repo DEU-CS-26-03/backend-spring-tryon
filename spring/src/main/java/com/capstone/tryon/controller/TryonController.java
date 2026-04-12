@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/api/v1/tryons", "/api/v1/tryon/jobs"})
+@RequestMapping("/api/v1/tryons")
 @RequiredArgsConstructor
 public class TryonController {
 
@@ -20,6 +20,11 @@ public class TryonController {
     @PostMapping
     public ResponseEntity<?> createJob(@RequestBody TryonCreateRequest request) {
         return ResponseEntity.ok(tryonService.createJob(request));
+    }
+
+    @PostMapping("/{jobId}/start")
+    public ResponseEntity<?> startJob(@PathVariable String jobId) {
+        return ResponseEntity.ok(tryonService.startJob(jobId));
     }
 
     @GetMapping("/{jobId}")

@@ -39,6 +39,16 @@ public class SecurityConfig {
                                 "/api/v1/health",
                                 "/api/v1/models/status"
                         ).permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tryons").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/tryons/*/start").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tryons/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tryons/*/result").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/garments/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/search/garment/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recommendations/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex ->
