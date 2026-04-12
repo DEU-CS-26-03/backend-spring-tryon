@@ -32,6 +32,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers(
                                 "/error",
                                 "/api/auth/register",
@@ -40,10 +41,8 @@ public class SecurityConfig {
                                 "/api/v1/models/status"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/tryons").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/tryons/*/start").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tryons/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/tryons/*/result").permitAll()
+                        .requestMatchers("/api/v1/tryons/**").permitAll()
+                        .requestMatchers("/api/v1/results/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/garments/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/search/garment/**").permitAll()
