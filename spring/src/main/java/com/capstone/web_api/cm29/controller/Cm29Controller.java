@@ -1,11 +1,12 @@
 package com.capstone.web_api.cm29.controller;
 
-import com.capstone.cm29.dto.*;
-import com.capstone.cm29.service.Cm29Service;
+import com.capstone.web_api.cm29.dto.*;
+import com.capstone.web_api.cm29.service.Cm29Service;
 import com.capstone.garment.dto.GarmentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.Map;

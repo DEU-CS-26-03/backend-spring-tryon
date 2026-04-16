@@ -1,6 +1,6 @@
 package com.capstone.web_api.naver.client;
 
-import com.capstone.cm29.dto.Cm29ItemResponse;
+import com.capstone.web_api.cm29.dto.Cm29ItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
