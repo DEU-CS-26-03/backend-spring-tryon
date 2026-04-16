@@ -1,5 +1,3 @@
-//요청 헤더에서 Bearer 토큰 추출, 검증 후 인증 객체를 SecurityContext에 저장
-
 package com.capstone.security.jwt;
 
 import jakarta.servlet.FilterChain;
@@ -28,13 +26,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         return HttpMethod.OPTIONS.matches(method)
-                || path.equals("/api/auth/register")
-                || path.equals("/api/auth/login")
+                || path.equals("/api/v1/auth/register")   // 변경: /api/auth → /api/v1/auth
+                || path.equals("/api/v1/auth/login")       // 변경: /api/auth → /api/v1/auth
                 || path.equals("/api/v1/health")
                 || path.equals("/api/v1/models/status")
-                || path.startsWith("/api/v1/tryons")
-                || path.startsWith("/api/v1/results")
+                || path.startsWith("/api/internal/")       // 추가: 내부 워커 필터 스킵
                 || path.startsWith("/error");
+        // 제거: /api/v1/tryons, /api/v1/results → 인증 필요하므로 필터 통과시켜야 함
     }
 
     @Override

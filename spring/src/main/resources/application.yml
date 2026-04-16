@@ -66,3 +66,9 @@ python:
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:3600000}
+
+cm29:
+  api:
+    base-url: https://api.29cm.co.kr
+    authorization: ${CM29_AUTHORIZATION}   # Bearer 토큰 (환경변수)
+    partner-key: ${CM29_PARTNER_KEY}       # Partner-Key (환경변수)

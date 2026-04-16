@@ -1,4 +1,3 @@
-//DB 테이블 매핑 (garments)
 package com.capstone.garment.entity;
 
 import jakarta.persistence.*;
@@ -12,8 +11,14 @@ public class Garment {
     @Column(name = "garment_id", length = 50)
     private String garmentId;
 
+    @Column(name = "owner_user_id")
+    private Long ownerUserId;
+
     @Column(nullable = false, length = 20)
-    private String status = "uploaded";
+    private String status = "ACTIVE";          // ACTIVE | HIDDEN | DELETED
+
+    @Column(name = "source_type", length = 30)
+    private String sourceType = "UPLOAD";      // UPLOAD | 29CM_IMPORT
 
     @Column(length = 30)
     private String category;
@@ -27,6 +32,9 @@ public class Garment {
     @Column(name = "file_url")
     private String fileUrl;
 
+    @Column(name = "brand_key")
+    private String brandKey;
+
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
@@ -35,18 +43,24 @@ public class Garment {
         this.createdAt = OffsetDateTime.now();
     }
 
-    public String getGarmentId() { return garmentId; }
-    public void setGarmentId(String garmentId) { this.garmentId = garmentId; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
-    public String getFilename() { return filename; }
-    public void setFilename(String filename) { this.filename = filename; }
-    public String getContentType() { return contentType; }
-    public void setContentType(String contentType) { this.contentType = contentType; }
-    public String getFileUrl() { return fileUrl; }
-    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
-    public OffsetDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
+    public String getGarmentId()              { return garmentId; }
+    public void setGarmentId(String v)        { this.garmentId = v; }
+    public Long getOwnerUserId()              { return ownerUserId; }
+    public void setOwnerUserId(Long v)        { this.ownerUserId = v; }
+    public String getStatus()                 { return status; }
+    public void setStatus(String v)           { this.status = v; }
+    public String getSourceType()             { return sourceType; }
+    public void setSourceType(String v)       { this.sourceType = v; }
+    public String getCategory()               { return category; }
+    public void setCategory(String v)         { this.category = v; }
+    public String getFilename()               { return filename; }
+    public void setFilename(String v)         { this.filename = v; }
+    public String getContentType()            { return contentType; }
+    public void setContentType(String v)      { this.contentType = v; }
+    public String getFileUrl()                { return fileUrl; }
+    public void setFileUrl(String v)          { this.fileUrl = v; }
+    public String getBrandKey()               { return brandKey; }
+    public void setBrandKey(String v)         { this.brandKey = v; }
+    public OffsetDateTime getCreatedAt()      { return createdAt; }
+    public void setCreatedAt(OffsetDateTime v){ this.createdAt = v; }
 }

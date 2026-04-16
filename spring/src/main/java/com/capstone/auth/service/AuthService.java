@@ -1,12 +1,10 @@
-//비즈니스 로그인 로직 분리
 package com.capstone.auth.service;
 
 import com.capstone.auth.dto.LoginRequest;
+import com.capstone.auth.dto.LoginResponse;
 import com.capstone.auth.dto.RegisterRequest;
 import com.capstone.auth.dto.RegisterResponse;
-import com.capstone.auth.dto.TokenResponse;
 import com.capstone.security.jwt.JwtTokenProvider;
-import com.capstone.user.dto.MeResponse;
 import com.capstone.user.entity.User;
 import com.capstone.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +22,9 @@ public class AuthService {
 
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        // @Valid가 기본 검증을 처리하므로, 비즈니스 중복 체크만 남김
         String email = normalizeEmail(request.getEmail());
-        String nickname = normalizeNickname(request.getNickname());
-        String password = request.getPassword();
-
-        if (email.isBlank() || password == null || password.isBlank() || nickname.isBlank()) {
-            throw new IllegalArgumentException("필수 값이 누락되었습니다.");
-        }
-
-        if (password.length() < 8) {
-            throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
-        }
+        String nickname = request.getNickname().trim();
 
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
@@ -46,52 +36,49 @@ public class AuthService {
 
         User user = new User();
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setNickname(nickname);
+        // role, status 는 Entity 기본값(USER, ACTIVE) 사용
 
         User saved = userRepository.save(user);
-        return new RegisterResponse("회원가입 성공", saved.getId());
+        return RegisterResponse.builder()
+                .message("회원가입이 완료되었습니다.")
+                .user(RegisterResponse.UserSummary.builder()
+                        .id(saved.getId())
+                        .email(saved.getEmail())
+                        .nickname(saved.getNickname())
+                        .role(saved.getRole().name())
+                        .build())
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         String email = normalizeEmail(request.getEmail());
-        String rawPassword = request.getPassword();
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "이메일 또는 비밀번호가 올바르지 않습니다."));
 
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getEmail());
 
-        return new TokenResponse(
-                "로그인 성공",
-                accessToken,
-                new TokenResponse.UserSummary(user.getId(), user.getNickname())
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public MeResponse getMe(String email) {
-        User user = userRepository.findByEmail(normalizeEmail(email))
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        return new MeResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getNickname(),
-                user.getProfileImageUrl()
-        );
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .tokenType("Bearer")
+                .user(LoginResponse.UserInfo.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .nickname(user.getNickname())
+                        .role(user.getRole().name())
+                        .build())
+                .build();
     }
 
     private String normalizeEmail(String email) {
         return email == null ? "" : email.trim().toLowerCase();
-    }
-
-    private String normalizeNickname(String nickname) {
-        return nickname == null ? "" : nickname.trim();
     }
 }

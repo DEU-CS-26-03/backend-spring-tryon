@@ -33,21 +33,36 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // ── 공개 경로 (인증 불필요) ───────────────────────────
                         .requestMatchers(
                                 "/error",
-                                "/api/auth/register",
-                                "/api/auth/login",
+                                "/api/v1/auth/register",   // 변경: /api/auth → /api/v1/auth
+                                "/api/v1/auth/login",      // 변경: /api/auth → /api/v1/auth
                                 "/api/v1/health",
                                 "/api/v1/models/status"
                         ).permitAll()
 
-                        .requestMatchers("/api/v1/tryons/**").permitAll()
-                        .requestMatchers("/api/v1/results/**").permitAll()
+                        // 의류 목록/검색/상세 비로그인 조회 허용
+                        .requestMatchers(HttpMethod.GET, "/api/v1/garments/**").permitAll()  // 변경: /api/garments → /api/v1/garments
 
-                        .requestMatchers(HttpMethod.GET, "/api/garments/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/search/garment/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/recommendations/**").permitAll()
+                        // 29CM 카테고리·브랜드·상품 조회 GET은 공개
+                        .requestMatchers(HttpMethod.GET, "/api/v1/29cm/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/29cm/brands/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/29cm/catalog/items/**").permitAll()
 
+                        // 내부 워커 API (Python worker 전용)
+                        // 추후 Worker-Token 헤더 검증으로 교체 권장
+                        .requestMatchers("/api/internal/**").permitAll()
+
+                        // ── 관리자/판매자 전용 ────────────────────────────────
+                        .requestMatchers(HttpMethod.POST, "/api/v1/29cm/catalog/import/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/29cm/images/presign").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/garments/**").hasAnyRole("ADMIN", "SELLER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/garments/**").hasAnyRole("ADMIN", "SELLER")
+
+                        // ── 그 외 모든 요청 인증 필요 ─────────────────────────
+                        // 제거: tryons/results permitAll 삭제 → 로그인 필수
+                        // 제거: /api/search/garment, /api/recommendations (명세에서 통합/삭제)
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex ->

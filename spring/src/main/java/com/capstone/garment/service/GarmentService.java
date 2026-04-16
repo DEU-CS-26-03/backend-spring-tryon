@@ -1,11 +1,14 @@
-//업로드·검증·목록·조회 로직
 package com.capstone.garment.service;
 
 import com.capstone.garment.dto.GarmentResponse;
+import com.capstone.garment.dto.GarmentUpdateRequest;
 import com.capstone.garment.entity.Garment;
 import com.capstone.garment.repository.GarmentRepository;
+import com.capstone.user.entity.User;
+import com.capstone.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,110 +22,120 @@ import java.util.stream.Collectors;
 public class GarmentService {
 
     private final GarmentRepository repository;
+    private final UserRepository userRepository;
 
     @Value("${file.upload.garments-dir}")
     private String uploadDir;
 
-    // jpg, png만 허용
-    private static final List<String> ALLOWED_TYPES = Arrays.asList(
-            "image/jpeg", "image/png"
-    );
-
-    // yml: max-file-size: 20MB
+    private static final List<String> ALLOWED_TYPES = Arrays.asList("image/jpeg", "image/png");
     private static final long MAX_SIZE_BYTES = 20 * 1024 * 1024L;
-
-    // 허용 카테고리 목록
     private static final List<String> ALLOWED_CATEGORIES = Arrays.asList(
             "top", "bottom", "dress", "outer", "shoes", "bag"
     );
 
-    public GarmentService(GarmentRepository repository) {
+    public GarmentService(GarmentRepository repository, UserRepository userRepository) {
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * 의류 이미지 업로드
-     * - jpg, png만 허용
-     * - 10MB 초과 시 예외
-     * - category: top / bottom / dress / outer / shoes / bag
-     */
-    public GarmentResponse upload(MultipartFile file, String category) throws IOException {
+    @Transactional
+    public GarmentResponse upload(MultipartFile file, String category, String email) throws IOException {
 
-        // 파일 타입 검증
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
             throw new IllegalArgumentException("JPG 또는 PNG 파일만 업로드할 수 있습니다.");
         }
-
-        // 용량 검증
         if (file.getSize() > MAX_SIZE_BYTES) {
             throw new IllegalArgumentException("파일 크기는 20MB를 초과할 수 없습니다.");
         }
-
-        // 카테고리 검증
-        if (category != null && !category.isBlank()
-                && !ALLOWED_CATEGORIES.contains(category)) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 카테고리입니다. 허용: " + ALLOWED_CATEGORIES);
+        if (category != null && !category.isBlank() && !ALLOWED_CATEGORIES.contains(category)) {
+            throw new IllegalArgumentException("유효하지 않은 카테고리입니다. 허용: " + ALLOWED_CATEGORIES);
         }
 
-        // 저장 파일명 생성
+        User owner = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         String garmentId = "gar_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
         String extension = "image/jpeg".equals(contentType) ? ".jpg" : ".png";
         String savedFilename = garmentId + extension;
 
-        // 디렉토리 생성 및 저장
         Path dirPath = Paths.get(uploadDir);
         Files.createDirectories(dirPath);
         Files.copy(file.getInputStream(), dirPath.resolve(savedFilename),
                 StandardCopyOption.REPLACE_EXISTING);
 
-        // DB 저장
         Garment entity = new Garment();
         entity.setGarmentId(garmentId);
-        entity.setStatus("uploaded");
+        entity.setOwnerUserId(owner.getId());
+        entity.setStatus("ACTIVE");
+        entity.setSourceType("UPLOAD");
         entity.setCategory(category);
         entity.setFilename(file.getOriginalFilename());
         entity.setContentType(contentType);
         entity.setFileUrl("/files/garments/" + savedFilename);
 
         repository.save(entity);
-
         return toResponse(entity);
     }
 
-    /**
-     * 의류 목록 조회
-     * - category 파라미터 있으면 필터, 없으면 전체
-     */
-    public List<GarmentResponse> list(String category) {
-        List<Garment> result = (category != null && !category.isBlank())
-                ? repository.findByCategory(category)
-                : repository.findAll();
-
-        return result.stream()
-                .map(this::toResponse)
+    @Transactional(readOnly = true)
+    public List<GarmentResponse> list(String q, String category, String sourceType, String brandKey) {
+        List<Garment> result = repository.findAll().stream()
+                .filter(g -> !"DELETED".equals(g.getStatus()) && !"HIDDEN".equals(g.getStatus()))
+                .filter(g -> category == null   || category.isBlank()   || category.equals(g.getCategory()))
+                .filter(g -> sourceType == null || sourceType.isBlank() || sourceType.equals(g.getSourceType()))
+                .filter(g -> brandKey == null   || brandKey.isBlank()   || brandKey.equals(g.getBrandKey()))
+                .filter(g -> q == null          || q.isBlank()          ||
+                        (g.getFilename() != null && g.getFilename().toLowerCase().contains(q.toLowerCase())))
                 .collect(Collectors.toList());
+
+        return result.stream().map(this::toResponse).collect(Collectors.toList());
     }
 
-    /**
-     * 의류 메타정보 단건 조회
-     */
+    @Transactional(readOnly = true)
     public GarmentResponse getById(String garmentId) {
         Garment entity = repository.findById(garmentId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "해당 의류를 찾을 수 없습니다: " + garmentId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 의류를 찾을 수 없습니다: " + garmentId));
         return toResponse(entity);
+    }
+
+    @Transactional
+    public GarmentResponse update(String garmentId, GarmentUpdateRequest request) {
+        Garment entity = repository.findById(garmentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 의류를 찾을 수 없습니다: " + garmentId));
+
+        if (request.getCategory() != null && !request.getCategory().isBlank()) {
+            entity.setCategory(request.getCategory());
+        }
+        if (request.getBrandKey() != null) {
+            entity.setBrandKey(request.getBrandKey());
+        }
+        if (request.getStatus() != null && !request.getStatus().isBlank()) {
+            entity.setStatus(request.getStatus());
+        }
+
+        repository.save(entity);
+        return toResponse(entity);
+    }
+
+    @Transactional
+    public void softDelete(String garmentId) {
+        Garment entity = repository.findById(garmentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 의류를 찾을 수 없습니다: " + garmentId));
+        entity.setStatus("HIDDEN");
+        repository.save(entity);
     }
 
     private GarmentResponse toResponse(Garment e) {
         return new GarmentResponse(
                 e.getGarmentId(),
                 e.getStatus(),
+                e.getSourceType(),
                 e.getCategory(),
                 e.getFilename(),
                 e.getContentType(),
                 e.getFileUrl(),
+                e.getBrandKey(),
                 e.getCreatedAt()
         );
     }

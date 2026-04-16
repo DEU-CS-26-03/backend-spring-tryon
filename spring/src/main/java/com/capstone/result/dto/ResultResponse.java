@@ -1,8 +1,17 @@
 package com.capstone.result.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.OffsetDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResultResponse {
 
     @JsonProperty("result_id")
@@ -11,33 +20,15 @@ public class ResultResponse {
     @JsonProperty("tryon_id")
     private String tryonId;
 
-    private String status;
+    @JsonProperty("result_image_url")
+    private String resultImageUrl;
 
-    @JsonProperty("result_url")
-    private String resultUrl;
+    @JsonProperty("result_thumbnail_url")
+    private String resultThumbnailUrl;
 
-    @JsonProperty("thumbnail_url")
-    private String thumbnailUrl;
+    @JsonProperty("generation_ms")
+    private Integer generationMs;
 
     @JsonProperty("created_at")
     private OffsetDateTime createdAt;
-
-    public ResultResponse() {}
-
-    public ResultResponse(String resultId, String tryonId, String status,
-                          String resultUrl, String thumbnailUrl, OffsetDateTime createdAt) {
-        this.resultId = resultId;
-        this.tryonId = tryonId;
-        this.status = status;
-        this.resultUrl = resultUrl;
-        this.thumbnailUrl = thumbnailUrl;
-        this.createdAt = createdAt;
-    }
-
-    public String getResultId() { return resultId; }
-    public String getTryonId() { return tryonId; }
-    public String getStatus() { return status; }
-    public String getResultUrl() { return resultUrl; }
-    public String getThumbnailUrl() { return thumbnailUrl; }
-    public OffsetDateTime getCreatedAt() { return createdAt; }
 }
