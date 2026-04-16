@@ -9,11 +9,11 @@ import lombok.Setter;
 @Setter
 public class TryonCreateRequest {
 
+    @NotBlank(message = "userImageId는 필수입니다.")
     @JsonProperty("user_image_id")
-    @NotBlank(message = "user_image_id는 필수입니다.")
     private String userImageId;
 
-    // garmentId 또는 externalItemKey 중 하나 필수 (서비스에서 검증)
+    // garmentId 또는 externalItemKey 중 하나 필수 (Service에서 검증)
     @JsonProperty("garment_id")
     private String garmentId;
 

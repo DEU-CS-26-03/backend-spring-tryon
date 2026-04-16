@@ -1,10 +1,17 @@
 package com.capstone.tryon.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "tryon_jobs")
+@Getter
+@Setter
 public class TryonJob {
 
     @Id
@@ -14,6 +21,7 @@ public class TryonJob {
     @Column(name = "user_id")
     private Long userId;
 
+    // queued | processing | completed | failed | cancelled
     @Column(nullable = false, length = 20)
     private String status = "queued";
 
@@ -23,7 +31,8 @@ public class TryonJob {
     @Column(name = "user_image_id", nullable = false)
     private String userImageId;
 
-    @Column(name = "garment_id")          // nullable — externalItemKey와 선택적
+    // garmentId와 externalItemKey 중 하나만 필수
+    @Column(name = "garment_id")
     private String garmentId;
 
     @Column(name = "external_item_key")
@@ -41,46 +50,11 @@ public class TryonJob {
     @Column(nullable = false)
     private boolean deleted = false;
 
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = OffsetDateTime.now();
-        this.updatedAt = OffsetDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = OffsetDateTime.now();
-    }
-
-    public String getTryonId()                       { return tryonId; }
-    public void setTryonId(String tryonId)           { this.tryonId = tryonId; }
-    public Long getUserId()                          { return userId; }
-    public void setUserId(Long userId)               { this.userId = userId; }
-    public String getStatus()                        { return status; }
-    public void setStatus(String status)             { this.status = status; }
-    public int getProgress()                         { return progress; }
-    public void setProgress(int progress)            { this.progress = progress; }
-    public String getUserImageId()                   { return userImageId; }
-    public void setUserImageId(String userImageId)   { this.userImageId = userImageId; }
-    public String getGarmentId()                     { return garmentId; }
-    public void setGarmentId(String garmentId)       { this.garmentId = garmentId; }
-    public String getExternalItemKey()               { return externalItemKey; }
-    public void setExternalItemKey(String key)       { this.externalItemKey = key; }
-    public String getResultId()                      { return resultId; }
-    public void setResultId(String resultId)         { this.resultId = resultId; }
-    public String getErrorCode()                     { return errorCode; }
-    public void setErrorCode(String errorCode)       { this.errorCode = errorCode; }
-    public String getErrorMessage()                  { return errorMessage; }
-    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
-    public boolean isDeleted()                       { return deleted; }
-    public void setDeleted(boolean deleted)          { this.deleted = deleted; }
-    public OffsetDateTime getCreatedAt()             { return createdAt; }
-    public OffsetDateTime getUpdatedAt()             { return updatedAt; }
-    public void setUpdatedAt(OffsetDateTime v)       { this.updatedAt = v; }
 }

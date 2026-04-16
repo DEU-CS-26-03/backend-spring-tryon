@@ -135,8 +135,8 @@ public class TryonService {
     }
 
     @Transactional
-    public Optional<TryonResponse> claimNextPendingJob() {
-        Optional<TryonJob> job = tryonJobRepository.findFirstByStatusIn(
+    public Optional<TryonResponse> claimNextPendingJob() { //FIFO 보장
+        Optional<TryonJob> job = tryonJobRepository.findFirstByStatusInOrderByCreatedAtAsc(
                 Arrays.asList("queued")
         );
 
