@@ -1,8 +1,7 @@
 package com.capstone.user.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,30 +11,35 @@ import java.time.OffsetDateTime;
 @Table(name = "users")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 120)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false)
     private String nickname;
 
-    @Column(name = "profile_image_url", length = 255)
-    private String profileImageUrl = "/uploads/profile/default.png";
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
+    @Builder.Default
     private UserRole role = UserRole.USER;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
+    @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
     @CreationTimestamp

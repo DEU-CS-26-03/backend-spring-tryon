@@ -13,9 +13,8 @@ public class TryonResponse {
     @JsonProperty("tryon_id")
     private String tryonId;
 
-    private String status;    // queued | processing | completed | failed
-
-    private int progress;     // 0 ~ 100
+    private String status;
+    private int progress;
 
     @JsonProperty("user_image_id")
     private String userImageId;
@@ -27,7 +26,6 @@ public class TryonResponse {
     private String resultId;
 
     private String message;
-
     private TryonErrorInfo error;
 
     @JsonProperty("created_at")

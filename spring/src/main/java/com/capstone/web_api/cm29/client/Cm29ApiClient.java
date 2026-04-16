@@ -1,4 +1,4 @@
-package com.capstone.cm29.client;
+package com.capstone.web_api.cm29.client;
 
 import com.capstone.cm29.dto.*;
 import lombok.RequiredArgsConstructor;

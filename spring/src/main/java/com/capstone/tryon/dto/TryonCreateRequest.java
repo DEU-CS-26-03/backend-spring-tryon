@@ -13,7 +13,6 @@ public class TryonCreateRequest {
     @JsonProperty("user_image_id")
     private String userImageId;
 
-    // garmentId 또는 externalItemKey 중 하나 필수 (Service에서 검증)
     @JsonProperty("garment_id")
     private String garmentId;
 

@@ -1,8 +1,7 @@
 package com.capstone.tryon.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,31 +11,32 @@ import java.time.OffsetDateTime;
 @Table(name = "tryon_jobs")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TryonJob {
 
     @Id
-    @Column(name = "tryon_id", length = 50)
+    @Column(name = "tryon_id")
     private String tryonId;
 
     @Column(name = "user_id")
     private Long userId;
 
-    // queued | processing | completed | failed | cancelled
-    @Column(nullable = false, length = 20)
-    private String status = "queued";
-
-    @Column(nullable = false)
-    private int progress = 0;
-
-    @Column(name = "user_image_id", nullable = false)
+    @Column(name = "user_image_id")
     private String userImageId;
 
-    // garmentId와 externalItemKey 중 하나만 필수
     @Column(name = "garment_id")
     private String garmentId;
 
     @Column(name = "external_item_key")
     private String externalItemKey;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "progress")
+    private int progress;
 
     @Column(name = "result_id")
     private String resultId;
@@ -47,7 +47,8 @@ public class TryonJob {
     @Column(name = "error_message")
     private String errorMessage;
 
-    @Column(nullable = false)
+    @Column(name = "deleted")
+    @Builder.Default
     private boolean deleted = false;
 
     @CreationTimestamp

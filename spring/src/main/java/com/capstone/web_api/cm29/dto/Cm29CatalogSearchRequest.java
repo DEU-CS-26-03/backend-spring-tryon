@@ -1,4 +1,4 @@
-package com.capstone.cm29.dto;
+package com.capstone.web_api.cm29.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

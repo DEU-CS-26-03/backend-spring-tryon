@@ -8,10 +8,7 @@ import lombok.Setter;
 @Setter
 public class InternalJobStatusRequest {
 
-    // queued | processing | completed | failed
     private String status;
-
-    // 0 ~ 100
     private int progress;
 
     @JsonProperty("result_id")

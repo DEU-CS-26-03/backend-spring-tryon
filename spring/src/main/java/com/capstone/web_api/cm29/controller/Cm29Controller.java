@@ -1,4 +1,4 @@
-package com.capstone.cm29.controller;
+package com.capstone.web_api.cm29.controller;
 
 import com.capstone.cm29.dto.*;
 import com.capstone.cm29.service.Cm29Service;

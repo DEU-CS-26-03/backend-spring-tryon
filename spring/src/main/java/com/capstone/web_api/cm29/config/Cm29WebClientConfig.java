@@ -1,4 +1,4 @@
-package com.capstone.cm29.config;
+package com.capstone.web_api.cm29.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.capstone.cm29.service;
+package com.capstone.web_api.cm29.service;
 
 import com.capstone.cm29.client.NaverShoppingApiClient;
 import com.capstone.cm29.dto.*;
