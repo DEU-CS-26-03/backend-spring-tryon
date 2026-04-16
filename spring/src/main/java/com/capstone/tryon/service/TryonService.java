@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -135,10 +134,10 @@ public class TryonService {
     }
 
     @Transactional
-    public Optional<TryonResponse> claimNextPendingJob() { //FIFO 보장
+    public Optional<TryonResponse> claimNextPendingJob() { // FIFO 보장
+        // ✅ 수정: 불필요한 ); 한 줄 제거
         Optional<TryonJob> job = tryonJobRepository.findFirstByStatusIn(
                 List.of("queued"));
-        );
 
         job.ifPresent(j -> {
             j.setStatus("processing");
