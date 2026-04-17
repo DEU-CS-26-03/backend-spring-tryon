@@ -62,7 +62,7 @@ file:
 
 python:
   inference:
-    base-url: ${AI_SERVER_URL:https://xxxx.ngrok-free.app}
+    base-url: ${AI_SERVER_URL:https://urchin-evil-reborn.ngrok-free.dev}
     connect-timeout-ms: 3000
     read-timeout-ms: 180000
 
